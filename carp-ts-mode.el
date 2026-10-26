@@ -21,6 +21,11 @@
 (require 'prog-mode)
 (require 'treesit)
 
+;; Flycheck is an optional dependency.
+(declare-function flycheck-mode "ext:flycheck" (&optional arg))
+(declare-function flycheck-define-checker "ext:flycheck"
+  (name docstring &rest properties) t)
+
 (defgroup carp-ts-mode nil
   "Major mode for the Carp programming language using Tree-sitter."
   :group 'languages
