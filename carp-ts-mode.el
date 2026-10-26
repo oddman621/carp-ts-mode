@@ -98,22 +98,22 @@
    :language 'carp
    :feature 'function
    '((list
-      . (symbol) @_head
-      . (symbol) @font-lock-function-name-face
+      :anchor (symbol) @_head
+      :anchor (symbol) @font-lock-function-name-face
       (:match "\\`\\(defn\\|defn-do\\|sig\\|defdynamic\\|defndynamic\\)\\'" @_head)))
 
    :language 'carp
    :feature 'type
    '((list
-      . (symbol) @_head
-      . (symbol) @font-lock-type-face
+      :anchor (symbol) @_head
+      :anchor (symbol) @font-lock-type-face
       (:match "\\`\\(deftype\\|register-type\\)\\'" @_head)))
 
    :language 'carp
    :feature 'namespace
    '((list
-      . (symbol) @_head
-      . (symbol) @font-lock-constant-face
+      :anchor (symbol) @_head
+      :anchor (symbol) @font-lock-constant-face
       (:match "\\`defmodule\\'" @_head)))
 
    :language 'carp
