@@ -21,10 +21,9 @@
 (require 'prog-mode)
 (require 'treesit)
 
-;; Flycheck is an optional dependency.
-(declare-function flycheck-mode "ext:flycheck" (&optional arg))
-(declare-function flycheck-define-checker "ext:flycheck"
-  (name docstring &rest properties) t)
+;; Load Flycheck at compile time and runtime.
+(eval-and-compile
+  (require 'flycheck))
 
 (defgroup carp-ts-mode nil
   "Major mode for the Carp programming language using Tree-sitter."
@@ -184,19 +183,19 @@ parser, such as the one provided by titan/tree-sitter-carp."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.carp\\'" . carp-ts-mode))
 
-;; Optional `carp --check' integration.  The patterns follow the output formats
-;; used by the existing carp-emacs Flycheck checker.
-(with-eval-after-load 'flycheck
-  (flycheck-define-checker carp-ts-checker
-    "Check Carp source files with `carp --check'."
-    :command ("carp" "--check" source)
-    :error-patterns
-    ((error line-start space (message) "\n  At line " line
-            ", column " column " in '" (file-name) "'" line-end)
-     (error line-start (file-name) ":" line ":" column " "
-            (message) line-end))
-    :modes (carp-ts-mode))
-  (add-to-list 'flycheck-checkers 'carp-ts-checker))
+;; Carp syntax checker for Flycheck.
+(flycheck-define-checker carp-ts-checker
+  "Check Carp source files with `carp --check'."
+  :command ("carp" "--check" source)
+  :error-patterns
+  ((error line-start space (message)
+          "\n  At line " line
+          ", column " column " in '" (file-name) "'" line-end)
+   (error line-start (file-name) ":" line ":" column " "
+          (message) line-end))
+  :modes (carp-ts-mode))
+
+(add-to-list 'flycheck-checkers 'carp-ts-checker)
 
 ;; Optional Flycheck integration.
 (declare-function flycheck-mode "flycheck" (&optional arg))
