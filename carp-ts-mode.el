@@ -198,13 +198,32 @@ parser, such as the one provided by titan/tree-sitter-carp."
     :modes (carp-ts-mode))
   (add-to-list 'flycheck-checkers 'carp-ts-checker))
 
-(defun carp-ts-mode--maybe-enable-flycheck ()
-  "Enable Flycheck in Carp buffers when it is installed and configured."
-  (when carp-ts-mode-enable-flycheck
-    (when (require 'flycheck nil t)
-      (flycheck-mode 1))))
+;; Optional Flycheck integration.
+(declare-function flycheck-mode "flycheck" (&optional arg))
 
-(add-hook 'carp-ts-mode-hook #'carp-ts-mode--maybe-enable-flycheck)
+(defun carp-ts-mode--maybe-enable-flycheck ()
+  "Register and enable Flycheck for Carp buffers."
+  (when (and carp-ts-mode-enable-flycheck
+             (require 'flycheck nil t))
+    (unless (memq 'carp-ts-checker flycheck-checkers)
+      ;; Evaluate the checker definition after Flycheck loads,
+      ;; so its macro is expanded at runtime.
+      (eval
+       '(flycheck-define-checker carp-ts-checker
+          "Check Carp source files with `carp --check'."
+          :command ("carp" "--check" source)
+          :error-patterns
+          ((error line-start space (message)
+                 "\n  At line " line
+                 ", column " column " in '" (file-name) "'" line-end)
+           (error line-start (file-name) ":" line ":" column " "
+                  (message) line-end))
+          :modes (carp-ts-mode)))
+      (add-to-list 'flycheck-checkers 'carp-ts-checker))
+    (flycheck-mode 1)))
+
+(add-hook 'carp-ts-mode-hook
+          #'carp-ts-mode--maybe-enable-flycheck)
 
 (provide 'carp-ts-mode)
 
