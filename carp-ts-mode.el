@@ -73,54 +73,53 @@
    :feature 'constant
    '((bool) @font-lock-constant-face
      ((symbol) @font-lock-constant-face
-      (#match? @font-lock-constant-face "^[A-Z][A-Z0-9_]+$")))
+      (:match "\\`[A-Z][A-Z0-9_]+\\'" @font-lock-constant-face)))
 
    :language 'carp
    :feature 'conditional
    '((symbol) @font-lock-keyword-face
-     (#match? @font-lock-keyword-face "^(if|match|match-ref|cond|unless)$"))
+     (:match "\\`\\(if\\|match\\|match-ref\\|cond\\|unless\\)\\'" @font-lock-keyword-face))
 
    :language 'carp
    :feature 'keyword
    '((symbol) @font-lock-keyword-face
-     (#match? @font-lock-keyword-face
-              "^(doc|sig|hidden|private|register|register-type|implements|do|and|or|else|let|let-do|ref|the|aset!|set!|quote|unquote|quote-splicing|quasiquote|unquote-splicing|with|address|def|defn|defn-do|deftype|defmacro|defmodule|defdynamic|defndynamic|definterface|deftemplate|Fn|λ)$"))
+     (:match "\\`\\(doc\\|sig\\|hidden\\|private\\|register\\|register-type\\|implements\\|do\\|and\\|or\\|else\\|let\\|let-do\\|ref\\|the\\|aset!\\|set!\\|quote\\|unquote\\|quote-splicing\\|quasiquote\\|unquote-splicing\\|with\\|address\\|def\\|defn\\|defn-do\\|deftype\\|defmacro\\|defmodule\\|defdynamic\\|defndynamic\\|definterface\\|deftemplate\\|Fn\\|λ\\)\\'" @font-lock-keyword-face))
 
    :language 'carp
    :feature 'import
    '((symbol) @font-lock-preprocessor-face
-     (#match? @font-lock-preprocessor-face "^(load|use|system-include|local-include)$"))
+     (:match "\\`\\(load\\|use\\|system-include\\|local-include\\)\\'" @font-lock-preprocessor-face))
 
    :language 'carp
    :feature 'repeat
    '((symbol) @font-lock-keyword-face
-     (#match? @font-lock-keyword-face "^(while|while-do|for|foreach|when|break)$"))
+     (:match "\\`\\(while\\|while-do\\|for\\|foreach\\|when\\|break\\)\\'" @font-lock-keyword-face))
 
    :language 'carp
    :feature 'function
    '((list
       . (symbol) @_head
       . (symbol) @font-lock-function-name-face
-      (#match? @_head "^(defn|defn-do|sig|defdynamic|defndynamic)$")))
+      (:match "\\`\\(defn\\|defn-do\\|sig\\|defdynamic\\|defndynamic\\)\\'" @_head)))
 
    :language 'carp
    :feature 'type
    '((list
       . (symbol) @_head
       . (symbol) @font-lock-type-face
-      (#match? @_head "^(deftype|register-type)$")))
+      (:match "\\`\\(deftype\\|register-type\\)\\'" @_head)))
 
    :language 'carp
    :feature 'namespace
    '((list
       . (symbol) @_head
       . (symbol) @font-lock-constant-face
-      (#match? @_head "^defmodule$")))
+      (:match "\\`defmodule\\'" @_head)))
 
    :language 'carp
    :feature 'operator
    '((symbol) @carp-ts-mode-operator-face
-     (#match? @carp-ts-mode-operator-face "^([+*/<>=-]|<=|>=|=>)$"))
+     (:match "\\`\\([+*/<>=-]\\|<=\\|>=\\|=>\\)\\'" @carp-ts-mode-operator-face))
 
    :language 'carp
    :feature 'bracket
