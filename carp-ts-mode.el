@@ -6,7 +6,6 @@
 ;; Package-Requires: ((emacs "29.1"))
 
 ;;; Commentary:
-
 ;; A small Tree-sitter major mode for the Carp programming language.
 ;; It uses the grammar from https://github.com/titan/tree-sitter-carp
 ;; and optionally integrates with Flycheck to run `carp --check'.
@@ -20,10 +19,8 @@
 
 (require 'prog-mode)
 (require 'treesit)
-
-;; Load Flycheck at compile time and runtime.
-(eval-and-compile
-  (require 'flycheck))
+;; Flycheck is an optional dependency.
+(declare-function flycheck-mode "ext:flycheck" (&optional arg))
 
 (defgroup carp-ts-mode nil
   "Major mode for the Carp programming language using Tree-sitter."
@@ -34,7 +31,6 @@
   "Indentation offset for nested Carp expressions."
   :type 'integer
   :group 'carp-ts-mode)
-
 (defcustom carp-ts-mode-enable-flycheck t
   "Whether to enable Flycheck automatically when it is available."
   :type 'boolean
@@ -49,7 +45,6 @@
   '((t :inherit shadow))
   "Face used for Carp brackets."
   :group 'carp-ts-mode)
-
 (defvar carp-ts-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     ;; Carp comments start with a semicolon and continue to the end of line.
@@ -63,7 +58,6 @@
    :language 'carp
    :feature 'comment
    '((comment) @font-lock-comment-face)
-
    :language 'carp
    :feature 'string
    '([(char) (string) (rawstring) (pattern)] @font-lock-string-face)
@@ -78,19 +72,16 @@
    '(((bool) @font-lock-constant-face)
      ((symbol) @font-lock-constant-face
       (:match "\\`[A-Z][A-Z0-9_]+\\'" @font-lock-constant-face)))
-
    :language 'carp
    :feature 'conditional
    '(((symbol) @font-lock-keyword-face
       (:match "\\`\\(if\\|match\\|match-ref\\|cond\\|unless\\)\\'"
               @font-lock-keyword-face)))
-
    :language 'carp
    :feature 'keyword
    '(((symbol) @font-lock-keyword-face
       (:match "\\`\\(doc\\|sig\\|hidden\\|private\\|register\\|register-type\\|implements\\|do\\|and\\|or\\|else\\|let\\|let-do\\|ref\\|the\\|aset!\\|set!\\|quote\\|unquote\\|quote-splicing\\|quasiquote\\|unquote-splicing\\|with\\|address\\|def\\|defn\\|defn-do\\|deftype\\|defmacro\\|defmodule\\|defdynamic\\|defndynamic\\|definterface\\|deftemplate\\|Fn\\|λ\\)'\\"
               @font-lock-keyword-face)))
-
    :language 'carp
    :feature 'import
    '(((symbol) @font-lock-preprocessor-face
@@ -102,7 +93,6 @@
    '(((symbol) @font-lock-keyword-face
       (:match "\\`\\(while\\|while-do\\|for\\|foreach\\|when\\|break\\)\\'"
               @font-lock-keyword-face)))
-
    :language 'carp
    :feature 'function
    '(((list
@@ -117,7 +107,6 @@
        :anchor (symbol) @_head
        :anchor (symbol) @font-lock-type-face)
       (:match "\\`\\(deftype\\|register-type\\)\\'" @_head)))
-
    :language 'carp
    :feature 'namespace
    '(((list
@@ -135,14 +124,12 @@
    :feature 'bracket
    '(["(" ")" "[" "]" "{" "}"] @carp-ts-mode-bracket-face))
   "Tree-sitter font-lock queries for Carp.")
-
 (defvar carp-ts-mode--font-lock-feature-list
   '((comment string number constant)
     (conditional keyword import repeat)
     (function type namespace)
     (operator bracket))
   "Font-lock feature levels for `carp-ts-mode'.")
-
 (defvar carp-ts-mode--indent-rules
   `((carp
      ;; Closing delimiters line up with the line containing their opener.
@@ -157,11 +144,9 @@
      ((parent-is "source") column-0 0)
      (no-node parent-bol 0)))
   "Basic indentation rules for Carp syntax trees.")
-
 ;;;###autoload
 (define-derived-mode carp-ts-mode prog-mode "Carp[TS]"
   "Major mode for Carp using Tree-sitter.
-
 The mode requires Emacs 29 or newer and an installed `carp' Tree-sitter
 parser, such as the one provided by titan/tree-sitter-carp."
   :group 'carp-ts-mode
@@ -179,50 +164,28 @@ parser, such as the one provided by titan/tree-sitter-carp."
               carp-ts-mode--font-lock-feature-list)
   (setq-local treesit-simple-indent-rules carp-ts-mode--indent-rules)
   (treesit-major-mode-setup))
-
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.carp\\'" . carp-ts-mode))
-
-;; Carp syntax checker for Flycheck.
-(flycheck-define-checker carp-ts-checker
-  "Check Carp source files with `carp --check'."
-  :command ("carp" "--check" source)
-  :error-patterns
-  ((error line-start space (message)
-          "\n  At line " line
-          ", column " column " in '" (file-name) "'" line-end)
-   (error line-start (file-name) ":" line ":" column " "
-          (message) line-end))
-  :modes (carp-ts-mode))
-
-(add-to-list 'flycheck-checkers 'carp-ts-checker)
-
-;; Optional Flycheck integration.
-(declare-function flycheck-mode "flycheck" (&optional arg))
-
+;; Optional `carp --check' integration.  The patterns follow the output formats
+;; used by the existing carp-emacs Flycheck checker.
+(with-eval-after-load 'flycheck
+  (flycheck-define-checker carp-ts-checker
+    "Check Carp source files with `carp --check'."
+    :command ("carp" "--check" source)
+    :error-patterns
+    ((error line-start space (message) "\n  At line " line
+            ", column " column " in '" (file-name) "'" line-end)
+     (error line-start (file-name) ":" line ":" column " "
+            (message) line-end))
+    :modes (carp-ts-mode))
+  (add-to-list 'flycheck-checkers 'carp-ts-checker))
 (defun carp-ts-mode--maybe-enable-flycheck ()
-  "Register and enable Flycheck for Carp buffers."
-  (when (and carp-ts-mode-enable-flycheck
-             (require 'flycheck nil t))
-    (unless (memq 'carp-ts-checker flycheck-checkers)
-      ;; Evaluate the checker definition after Flycheck loads,
-      ;; so its macro is expanded at runtime.
-      (eval
-       '(flycheck-define-checker carp-ts-checker
-          "Check Carp source files with `carp --check'."
-          :command ("carp" "--check" source)
-          :error-patterns
-          ((error line-start space (message)
-                 "\n  At line " line
-                 ", column " column " in '" (file-name) "'" line-end)
-           (error line-start (file-name) ":" line ":" column " "
-                  (message) line-end))
-          :modes (carp-ts-mode)))
-      (add-to-list 'flycheck-checkers 'carp-ts-checker))
-    (flycheck-mode 1)))
+  "Enable Flycheck in Carp buffers when it is installed and configured."
+  (when carp-ts-mode-enable-flycheck
+    (when (require 'flycheck nil t)
+      (flycheck-mode 1))))
 
-(add-hook 'carp-ts-mode-hook
-          #'carp-ts-mode--maybe-enable-flycheck)
+(add-hook 'carp-ts-mode-hook #'carp-ts-mode--maybe-enable-flycheck)
 
 (provide 'carp-ts-mode)
 
