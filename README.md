@@ -3,7 +3,7 @@
 ```
 ;; in `~/.emacs.d/init.el`
 
-(setenv "CARP_DIR" "~/Carp")
+(setenv "CARP_DIR" "/path/to/Carp")
 
 (require 'treesit)
 
