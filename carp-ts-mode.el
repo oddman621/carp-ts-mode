@@ -80,7 +80,7 @@
    :language 'carp
    :feature 'keyword
    '(((symbol) @font-lock-keyword-face
-      (:match "\\`\\(doc\\|sig\\|hidden\\|private\\|register\\|register-type\\|implements\\|do\\|and\\|or\\|else\\|let\\|let-do\\|ref\\|the\\|aset!\\|set!\\|quote\\|unquote\\|quote-splicing\\|quasiquote\\|unquote-splicing\\|with\\|address\\|def\\|defn\\|defn-do\\|deftype\\|defmacro\\|defmodule\\|defdynamic\\|defndynamic\\|definterface\\|deftemplate\\|Fn\\|λ\\)'\\"
+      (:match "\\`\\(doc\\|sig\\|hidden\\|private\\|register\\|register-type\\|implements\\|do\\|and\\|or\\|else\\|let\\|let-do\\|ref\\|the\\|aset!\\|set!\\|quote\\|unquote\\|quote-splicing\\|quasiquote\\|unquote-splicing\\|with\\|address\\|def\\|defn\\|defn-do\\|deftype\\|defmacro\\|defmodule\\|defdynamic\\|defndynamic\\|definterface\\|deftemplate\\|Fn\\|λ\\)\\'"
               @font-lock-keyword-face)))
    :language 'carp
    :feature 'import
